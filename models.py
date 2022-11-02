@@ -1,3 +1,4 @@
+import json
 import sqlite3
 from sqlalchemy import Table, create_engine
 from sqlalchemy.sql import select
@@ -24,9 +25,15 @@ if __name__ == '__main__':
     def create_users_table():
         Users.metadata.create_all(engine)
 
+    with open('passwords.json', encoding='utf8') as pwd_fp:
+        pwd_dict = json.load(pwd_fp)
+
     #create the table
-    create_users_table()
-    ins = Users_tbl.insert().values(username='e3', password=generate_password_hash('e3'))
+    # create_users_table()
     conn = engine.connect()
-    conn.execute(ins)
+    for username, pwd in pwd_dict.items():
+
+        ins = Users_tbl.insert().values(username=username, password=generate_password_hash(pwd))
+        conn.execute(ins)
+
     conn.close()

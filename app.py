@@ -9,30 +9,20 @@ import auth_page, stats_page
 
 from flask_login import current_user, logout_user
 import configparser
+import dash_bootstrap_components as dbc
 
-KAF_LIST = ["a8", "e3"]
+KAF_LIST = stats_page.SPEC_CODES_DICT.keys()
 
-# def get_usrname_pwd() -> Tuple[str, str]:
-#     # Функция возвращает имя пользователя и пароль (в виде кортежа из двух строк) для текущей сессии
-#     # Нужно для того чтобы понимать с какой кафедры пользователь
-#     header = flask.request.headers.get('Authorization', None)
-#     username_password = base64.b64decode(header.split('Basic ')[1])
-#     username_password_utf8 = username_password.decode('utf8')
-#     username, password = username_password_utf8.split(':', 1)
-#     return username, password
+external_stylesheets = [dbc.themes.GRID,
+                        dbc.themes.BOOTSTRAP,
+                        'https://codepen.io/chriddyp/pen/bWLwgP.css'
+                        ]
 
-# def get_valid_usrname_pwd_list() -> dict:
-#     # Функция возвращает словарь с доступными логинами-паролями
-#     with open('config.json', encoding='utf-8') as config_fp:
-#         valid_usrname_pwd_list = json.load(config_fp)["authorization"]
-#     return valid_usrname_pwd_list
-
-
-# VALID_USERNAME_PASSWORD_PAIRS = get_valid_usrname_pwd_list()
-
-external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
-
-app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
+app = dash.Dash(__name__, external_stylesheets=external_stylesheets, suppress_callback_exceptions=True,
+                meta_tags=[
+                    {'name': 'viewport', 'content': 'width=device-width, initial-scale=0.7'}
+                ]
+                )
 
 server = app.server
 
@@ -60,6 +50,7 @@ app.layout = html.Div([
 )
 def display_page(pathname):
     if pathname in ('/', '/logout'):
+        logout_user()
         return auth_page.login
     elif pathname[1:] in KAF_LIST:
         if current_user.is_authenticated:
@@ -69,5 +60,5 @@ def display_page(pathname):
 
 
 if __name__ == '__main__':
-    app.run_server(debug=True)
+    app.run(debug=True)
 
