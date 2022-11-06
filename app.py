@@ -40,9 +40,9 @@ auth_page.models.db.init_app(server)
 
 auth_page.login_manager.init_app(server)
 
-app.layout = html.Div([
+app.layout = dbc.Container([
     html.Div(id='page-content', className='content'), dcc.Location(id='url', refresh=False)
-], className='container')
+], fluid='sm')#, style={'marginLeft': 250, 'marginRight': 250})
 
 @app.callback(
     Output('page-content', 'children'),
