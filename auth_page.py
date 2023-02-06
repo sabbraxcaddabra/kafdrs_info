@@ -1,6 +1,7 @@
 from dash import dcc
 from dash import html
 from dash import Input, Output, State, callback
+import dash_bootstrap_components as dbc
 
 import models
 from flask_login import login_user, logout_user, LoginManager
@@ -23,16 +24,18 @@ def load_user(user_id):
     return models.Users.query.get(int(user_id))
 
 @callback(
-    Output('url_login', 'pathname'),
+    [Output('url_login', 'pathname'), Output('output-state', 'children')],
     [Input('login-button', 'n_clicks')],
-    [State('uname-box', 'value'), State('pwd-box', 'value')])
+    [State('uname-box', 'value'), State('pwd-box', 'value')],
+    prevent_initial_call=True
+)
 def successful(n_clicks, input1, input2):
     user = models.Users.query.filter_by(username=input1).first()
     if user:
         if check_password_hash(user.password, input2):
             login_user(user)
-            return f'/{input1}'
+            return f'/{input1}', ''
         else:
-            pass
+            return '/', dbc.Alert('Неверный пароль!', color="danger", duration=4000)
     else:
-        pass
+        return '/', dbc.Alert('Неверный логин!', color="danger", duration=4000)

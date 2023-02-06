@@ -46,7 +46,7 @@ app.layout = dbc.Container([
 
 @app.callback(
     Output('page-content', 'children'),
-    [Input('url', 'pathname')]
+    [Input('url', 'pathname')],
 )
 def display_page(pathname):
     if pathname in ('/', '/logout'):

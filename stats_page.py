@@ -2,6 +2,7 @@ from dash import dcc, html, dash_table
 from dash import Input, Output, State, callback
 import json
 import plotly.express as px
+from copy import deepcopy
 
 import dash_bootstrap_components as dbc
 
@@ -56,7 +57,7 @@ def get_fig(data_frame, title):
                  height=400)
     fig.update_layout(
         xaxis_title="Год",
-        yaxis_title=title,
+        yaxis_title='',
         legend_title="",
         legend=dict(
             x=0,
@@ -113,6 +114,7 @@ def get_spec_code_stats(spec_code):
     return all_year_dict
 
 def get_stats_df(stats_dict):
+    stats_dict = deepcopy(stats_dict)
     for key in stats_dict:
         st_dict = stats_dict[key]
         if 'code' in st_dict.keys():
@@ -133,16 +135,18 @@ def generate_layout(kaf_name):
     options = {spec_code: f'{spec_code} - {STATS_DICT["2022"][spec_code]["name"]}' for spec_code in spec_codes}
     stats =  html.Div([
         html.H2(children=f'Статистика кафедры {kaf_name}', id='h1'),
+        html.Button(children='Выйти', id='logout'),
+        html.Br(),
         dcc.Dropdown(options=options, value=spec_codes[0], id='spec_codes', multi=False, clearable=False),
         html.Br(),
         dbc.Col(
             html.Div(children='', id='kaf_stats')
         ),
-        dcc.Graph(id='fig1', style={'height': '80vh'}),
-        dcc.Graph(id='fig2', style={'height': '80vh'}),
-        dcc.Graph(id='fig3', style={'height': '80vh'}),
-        dcc.Graph(id='fig4', style={'height': '80vh'}),
-        dcc.Graph(id='fig5', style={'height': '80vh'}),
+        dcc.Graph(id='fig1'),
+        dcc.Graph(id='fig2'),
+        dcc.Graph(id='fig3'),
+        dcc.Graph(id='fig4'),
+        dcc.Graph(id='fig5'),
     ])
 
     return stats
@@ -188,3 +192,10 @@ def get_stats(spec_code):
         style_cell={'textAlign': 'left', 'minWidth': '100px'},
         export_format='xlsx'
         )
+
+@callback(
+    Output('url', 'pathname'),
+    [Input('logout', 'n_clicks')]
+)
+def logout_button(n_clicks):
+    return '/'
